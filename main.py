@@ -26,34 +26,34 @@ def load_dict(dict_name=r'dictionary\rus.txt'):
     letters = Counter(chain.from_iterable(word_dict))
 
     total = sum(letters.values())
-    letters_freqs = {character: value / total for character, value in letters.items()}
+    letters_freqs = {letter: value / total for letter, value in letters.items()}
 
 
-def calculate_word_commonality(word):
-    score = 0.0
-    for char in word:
-        score += letters_freqs[char]
-    return score / (WORD_LENGTH - len(set(word)) + 1)
+def calc_word_weight(word):
+    score = 0
+    for letter in set(word):
+        score += letters_freqs[letter]
+    return score
 
 
-def sort_by_word_commonality(words):
+def sort_by_word_weight(words):
     sort_by = operator.itemgetter(1)
-    return sorted([(word, calculate_word_commonality(word)) for word in words], key=sort_by, reverse=True)
+    return sorted([(word, calc_word_weight(word)) for word in words], key=sort_by, reverse=True)
 
 
-def display_word_table(word_commonalities):
-    for (word, freq) in word_commonalities:
+def display_word_table(word_weights):
+    for (word, freq) in word_weights:
         print(f"{word:<10} | {freq:<5.2}")
 
 
-def solver(present, absent, placement='.'*WORD_LENGTH):
+def solver(present, absent, template='.'*WORD_LENGTH):
     global solutions
     if present != '?':
         solutions = [word for word in solutions if all(letter in word for letter in present)]
 
     if absent != '?':
         solutions = [word for word in solutions if all(letter not in word for letter in absent)]
-    pattern = re.compile(placement)
+    pattern = re.compile(template)
     solutions = [word for word in solutions if pattern.match(word)]
 
 
@@ -64,15 +64,15 @@ def main():
     if len(sys.argv) == 4:
         present = sys.argv[1]
         absent = sys.argv[2]
-        teplate = sys.argv[3]
+        template = sys.argv[3]
         print('Total word count:', len(solutions))
-        solver(present, absent, teplate)
+        solver(present, absent, template)
         print('Word count after apply rules:', len(solutions))
-        display_word_table(sort_by_word_commonality(solutions)[:5])
+        display_word_table(sort_by_word_weight(solutions)[:5])
     else:
-        print("Usage: ./main.py <letters in word|?> <letters not in word|?> <placement|.....>")
-        print("Examples: ./main.py ? ? .....")
-        print("Examples: ./main.py орма иктпен .орма")
+        print("Usage: python main.py <letters in word|?> <letters not in word|?> <template|.....>")
+        print("Examples: python main.py ? ? .....")
+        print("Examples: python main.py орма иктпен .орма")
         exit()
 
 if __name__ == '__main__':
