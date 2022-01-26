@@ -19,7 +19,7 @@ def load_dict(dict_name=r'dictionary\rus.txt'):
     with open(dict_name, "r", encoding='utf-8') as word_list:
         word_dict = word_list.read().split('\n')
 
-    #for word in word_dict:
+    # for word in word_dict:
     #    for letter in word:
     #        letters[letter] = letters.get(letter, 0) + 1
     # replaced with
@@ -70,10 +70,11 @@ def main():
         print('Word count after apply rules:', len(solutions))
         display_word_table(sort_by_word_weight(solutions)[:5])
     else:
-        print("Usage: python main.py <letters in word|?> <letters not in word|?> <template|.....>")
-        print("Examples: python main.py ? ? .....")
-        print("Examples: python main.py орма иктпен .орма")
-        exit()
+        print('Usage: python main.py <letters in word|?> <letters not in word|?> <template|.....>')
+        print('Examples: python main.py ? ? .....')
+        print('Examples: python main.py орма иктпен .орма')
+        print('Examples: python main.py та ико "...т[^а]" ')
+
 
 if __name__ == '__main__':
     main()
