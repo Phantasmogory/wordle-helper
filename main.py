@@ -3,7 +3,7 @@ import sys
 from collections import Counter
 from itertools import chain
 import operator
-
+import clipboard
 
 word_dict = []
 letters = {}
@@ -57,6 +57,34 @@ def solver(present, absent, template='.'*WORD_LENGTH):
     solutions = [word for word in solutions if pattern.match(word)]
 
 
+def clipboard_mode():
+    global solutions
+    text = clipboard.paste()
+    present = absent = ''
+    template = ['.']*WORD_LENGTH
+    for i, match in enumerate(re.findall(r'(bg-present|bg-absent|bg-correct)[^<]*>(.)</div', text)):
+        if match[0] == 'bg-present':
+            present += match[1]
+            if template[i % WORD_LENGTH][0] == '^':
+                template[i % WORD_LENGTH] += match[1]
+            if template[i % WORD_LENGTH][0] == '.':
+                template[i % WORD_LENGTH] = '^' + match[1]
+        if match[0] == 'bg-absent':
+            absent += match[1]
+        if match[0] == 'bg-correct':
+            present += match[1]
+            template[i % WORD_LENGTH] = match[1]
+    teplatestr = ''.join([f'[{t}]' if '^' in t else t for t in template])
+    if present or absent:
+        print('Found in clipboard:')
+        print('python main.py', ''.join(list(set(present))), ''.join(list(set(absent))), teplatestr)
+        load_dict()
+        solutions = word_dict.copy()
+        solver(present, absent, teplatestr)
+        print('Word count after apply rules:', len(solutions))
+        display_word_table(sort_by_word_weight(solutions)[:5])
+
+
 def main():
     global solutions
     load_dict()
@@ -74,6 +102,10 @@ def main():
         print('Examples: python main.py ? ? .....')
         print('Examples: python main.py орма иктпен .орма')
         print('Examples: python main.py та ико "...т[^а]" ')
+        print('Examples: python main.py')
+        print('  For Clipboard mode')
+        clipboard_mode()
+
 
 
 if __name__ == '__main__':
